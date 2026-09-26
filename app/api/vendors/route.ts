@@ -1,0 +1,4 @@
+import {NextResponse} from "next/server";
+import {db} from "@/lib/prisma";
+export async function GET(){return NextResponse.json(await db.vendor.findMany({include:{purchases:true},orderBy:{name:"asc"}}))}
+export async function POST(req:Request){try{const b=await req.json();if(!b.name)return NextResponse.json({error:"Vendor name is required"},{status:400});return NextResponse.json(await db.vendor.create({data:{name:b.name,gstin:b.gstin,phone:b.phone,email:b.email,address:b.address}}),{status:201})}catch(e){return NextResponse.json({error:e instanceof Error?e.message:"Unable to create vendor"},{status:500})}}
