@@ -1,132 +1,14 @@
-generator client {
-  provider = "prisma-client-js"
-}
-datasource db {
-  provider = "postgresql"
-  url = env("DATABASE_URL")
-}
+generator client { provider = "prisma-client-js" }
+datasource db { provider = "postgresql" url = env("DATABASE_URL") }
 enum StockMovementType { PURCHASE SALE CUSTOMER_RETURN PURCHASE_RETURN TRANSFER_IN TRANSFER_OUT ADJUSTMENT_IN ADJUSTMENT_OUT DAMAGE }
 enum OrderStatus { NEW ACCEPTED PICKED PACKED READY_TO_SHIP SHIPPED DELIVERED CANCELLED RTO RETURNED }
-model Product {
-  id String @id @default(cuid())
-  sku String @unique
-  barcode String? @unique
-  name String
-  category String?
-  brand String?
-  hsn String?
-  gstRate Decimal @db.Decimal(5,2)
-  costPrice Decimal @db.Decimal(12,2)
-  sellingPrice Decimal @db.Decimal(12,2)
-  mrp Decimal @db.Decimal(12,2)
-  reorderLevel Int @default(10)
-  safetyStock Int @default(0)
-  active Boolean @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  stock StockBalance[]
-  movements StockMovement[]
-  orderItems OrderItem[]
-  purchaseItems PurchaseItem[]
-}
-model Warehouse {
-  id String @id @default(cuid())
-  code String @unique
-  name String
-  city String?
-  active Boolean @default(true)
-  createdAt DateTime @default(now())
-  stock StockBalance[]
-  movements StockMovement[]
-  orders Order[]
-}
-model StockBalance {
-  id String @id @default(cuid())
-  productId String
-  warehouseId String
-  quantity Int @default(0)
-  reserved Int @default(0)
-  updatedAt DateTime @updatedAt
-  product Product @relation(fields:[productId],references:[id],onDelete: Cascade)
-  warehouse Warehouse @relation(fields:[warehouseId],references:[id],onDelete: Cascade)
-  @@unique([productId,warehouseId])
-}
-model StockMovement {
-  id String @id @default(cuid())
-  productId String
-  warehouseId String
-  type StockMovementType
-  quantity Int
-  unitCost Decimal? @db.Decimal(12,2)
-  reference String?
-  notes String?
-  createdAt DateTime @default(now())
-  product Product @relation(fields:[productId],references:[id])
-  warehouse Warehouse @relation(fields:[warehouseId],references:[id])
-  @@index([productId,createdAt])
-  @@index([warehouseId,createdAt])
-}
-model Vendor {
-  id String @id @default(cuid())
-  name String
-  gstin String?
-  phone String?
-  email String?
-  address String?
-  createdAt DateTime @default(now())
-  purchases PurchaseOrder[]
-}
-model PurchaseOrder {
-  id String @id @default(cuid())
-  poNumber String @unique
-  vendorId String
-  warehouseId String
-  status String @default("DRAFT")
-  total Decimal @default(0) @db.Decimal(12,2)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  vendor Vendor @relation(fields:[vendorId],references:[id])
-  warehouse Warehouse @relation(fields:[warehouseId],references:[id])
-  items PurchaseItem[]
-}
-model PurchaseItem {
-  id String @id @default(cuid())
-  purchaseId String
-  productId String
-  quantity Int
-  unitCost Decimal @db.Decimal(12,2)
-  purchase PurchaseOrder @relation(fields:[purchaseId],references:[id],onDelete: Cascade)
-  product Product @relation(fields:[productId],references:[id])
-}
-model Order {
-  id String @id @default(cuid())
-  orderNumber String @unique
-  channel String
-  status OrderStatus @default(NEW)
-  warehouseId String?
-  customerName String?
-  total Decimal @default(0) @db.Decimal(12,2)
-  externalId String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  warehouse Warehouse? @relation(fields:[warehouseId],references:[id])
-  items OrderItem[]
-  @@index([channel,status])
-}
-model OrderItem {
-  id String @id @default(cuid())
-  orderId String
-  productId String
-  quantity Int
-  unitPrice Decimal @db.Decimal(12,2)
-  order Order @relation(fields:[orderId],references:[id],onDelete: Cascade)
-  product Product @relation(fields:[productId],references:[id])
-}
-model Customer {
-  id String @id @default(cuid())
-  name String
-  phone String?
-  email String?
-  address String?
-  createdAt DateTime @default(now())
-}
+model Product { id String @id @default(cuid()) sku String @unique barcode String? @unique name String category String? brand String? hsn String? gstRate Decimal @db.Decimal(5,2) costPrice Decimal @db.Decimal(12,2) sellingPrice Decimal @db.Decimal(12,2) mrp Decimal @db.Decimal(12,2) reorderLevel Int @default(10) safetyStock Int @default(0) active Boolean @default(true) createdAt DateTime @default(now()) updatedAt DateTime @updatedAt stock StockBalance[] movements StockMovement[] orderItems OrderItem[] purchaseItems PurchaseItem[] }
+model Warehouse { id String @id @default(cuid()) code String @unique name String city String? active Boolean @default(true) createdAt DateTime @default(now()) stock StockBalance[] movements StockMovement[] orders Order[] }
+model StockBalance { id String @id @default(cuid()) productId String warehouseId String quantity Int @default(0) reserved Int @default(0) updatedAt DateTime @updatedAt product Product @relation(fields:[productId],references:[id],onDelete:Cascade) warehouse Warehouse @relation(fields:[warehouseId],references:[id],onDelete:Cascade) @@unique([productId,warehouseId]) }
+model StockMovement { id String @id @default(cuid()) productId String warehouseId String type StockMovementType quantity Int unitCost Decimal? @db.Decimal(12,2) reference String? notes String? createdAt DateTime @default(now()) product Product @relation(fields:[productId],references:[id]) warehouse Warehouse @relation(fields:[warehouseId],references:[id]) @@index([productId,createdAt]) @@index([warehouseId,createdAt]) }
+model Vendor { id String @id @default(cuid()) name String gstin String? phone String? email String? address String? createdAt DateTime @default(now()) purchases PurchaseOrder[] }
+model PurchaseOrder { id String @id @default(cuid()) poNumber String @unique vendorId String warehouseId String status String @default("DRAFT") total Decimal @default(0) @db.Decimal(12,2) createdAt DateTime @default(now()) updatedAt DateTime @updatedAt vendor Vendor @relation(fields:[vendorId],references:[id]) warehouse Warehouse @relation(fields:[warehouseId],references:[id]) items PurchaseItem[] }
+model PurchaseItem { id String @id @default(cuid()) purchaseId String productId String quantity Int unitCost Decimal @db.Decimal(12,2) purchase PurchaseOrder @relation(fields:[purchaseId],references:[id],onDelete:Cascade) product Product @relation(fields:[productId],references:[id]) }
+model Order { id String @id @default(cuid()) orderNumber String @unique channel String status OrderStatus @default(NEW) warehouseId String? customerName String? total Decimal @default(0) @db.Decimal(12,2) externalId String? createdAt DateTime @default(now()) updatedAt DateTime @updatedAt warehouse Warehouse? @relation(fields:[warehouseId],references:[id]) items OrderItem[] @@index([channel,status]) }
+model OrderItem { id String @id @default(cuid()) orderId String productId String quantity Int unitPrice Decimal @db.Decimal(12,2) order Order @relation(fields:[orderId],references:[id],onDelete:Cascade) product Product @relation(fields:[productId],references:[id]) }
+model Customer { id String @id @default(cuid()) name String phone String? email String? address String? createdAt DateTime @default(now()) }
