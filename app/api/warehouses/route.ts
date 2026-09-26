@@ -1,0 +1,4 @@
+import {NextResponse} from "next/server";
+import {db} from "@/lib/prisma";
+export async function GET(){return NextResponse.json(await db.warehouse.findMany({include:{stock:{include:{product:true}}},orderBy:{name:"asc"}}))}
+export async function POST(req:Request){try{const b=await req.json();if(!b.code||!b.name)return NextResponse.json({error:"code and name are required"},{status:400});return NextResponse.json(await db.warehouse.create({data:{code:b.code,name:b.name,city:b.city}}),{status:201})}catch(e){return NextResponse.json({error:e instanceof Error?e.message:"Unable to create warehouse"},{status:500})}}
