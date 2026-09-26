@@ -1,3 +1,1 @@
-import {NextResponse} from "next/server";
-import {db} from "@/lib/prisma";
-export async function GET(){try{await db.$queryRaw`SELECT 1`;return NextResponse.json({ok:true,database:"connected",service:"StockOS"})}catch{return NextResponse.json({ok:false,database:"not_configured",service:"StockOS"},{status:503})}}
+import {NextResponse} from "next/server"; import {db} from "@/lib/prisma"; export async function GET(){try{await db.$queryRaw`SELECT 1`;return NextResponse.json({ok:true,database:"connected",service:"StockOS"})}catch{return NextResponse.json({ok:false,database:"not_configured",service:"StockOS"},{status:503})}}
