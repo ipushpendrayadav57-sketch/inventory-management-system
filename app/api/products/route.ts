@@ -1,0 +1,4 @@
+import {NextResponse} from "next/server";
+import {db} from "@/lib/prisma";
+export async function GET(){const products=await db.product.findMany({where:{active:true},include:{stock:{include:{warehouse:true}}},orderBy:{createdAt:"desc"}});return NextResponse.json(products)}
+export async function POST(req:Request){try{const body=await req.json();if(!body.sku||!body.name) return NextResponse.json({error:"sku and name are required"},{status:400});const product=await db.product.create({data:{sku:body.sku,name:body.name,barcode:body.barcode||undefined,category:body.category,brand:body.brand,hsn:body.hsn,gstRate:body.gstRate??18,costPrice:body.costPrice??0,sellingPrice:body.sellingPrice??0,mrp:body.mrp??body.sellingPrice??0,reorderLevel:body.reorderLevel??10,safetyStock:body.safetyStock??0}});return NextResponse.json(product,{status:201})}catch(e){return NextResponse.json({error:e instanceof Error?e.message:"Unable to create product"},{status:500})}}
