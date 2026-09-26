@@ -53,6 +53,7 @@ model Product {
   movements     StockMovement[]
   orderItems    OrderItem[]
   purchaseItems PurchaseItem[]
+  receiptItems  PurchaseReceiptItem[]
 }
 
 model Warehouse {
