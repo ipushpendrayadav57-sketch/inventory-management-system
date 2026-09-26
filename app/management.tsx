@@ -1,5 +1,5 @@
 "use client";
-import {useEffect,useState} from "react";
+import {useEffect,useState} from "react";\nimport type {ReactNode} from "react";
 import {Plus,Search,RefreshCw,PackagePlus,Truck,Warehouse as WarehouseIcon,ShoppingBag,ArrowUpFromLine,Undo2,ReceiptText,X,ChevronRight,ChevronLeft} from "lucide-react";
 
 type Product={id:string;sku:string;name:string;category?:string;costPrice:string;sellingPrice:string;mrp:string;stock:{quantity:number;reserved:number;warehouse:{name:string}}[]};
@@ -11,10 +11,10 @@ type Purchase={id:string;poNumber:string;status:string;total:string;vendor:{name
 const money=(n:number)=>new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:0}).format(n);
 async function get<T>(url:string):Promise<T>{const r=await fetch(url);if(!r.ok)throw new Error("Request failed");return r.json()}
 
-export default function Management(){
- const [tab,setTab]=useState<"products"|"purchases"|"vendors"|"warehouses"|"orders"|"stock"|"returns">("products");
+export default function Management({initialTab}:{initialTab?:"products"|"purchases"|"vendors"|"warehouses"|"orders"|"stock"|"returns"}={}){
+ const [tab,setTab]=useState<"products"|"purchases"|"vendors"|"warehouses"|"orders"|"stock"|"returns">(initialTab||"products");
  const [products,setProducts]=useState<Product[]>([]),[vendors,setVendors]=useState<Vendor[]>([]),[warehouses,setWarehouses]=useState<Warehouse[]>([]),[orders,setOrders]=useState<Order[]>([]),[purchases,setPurchases]=useState<Purchase[]>([]);
- const [loading,setLoading]=useState(false),[search,setSearch]=useState(""),[modal,setModal]=useState<string|null>(null);
+ const [loading,setLoading]=useState(false),[search,setSearch]=useState(""),[modal,setModal]=useState<string|null>(null);\n useEffect(()=>{if(initialTab)setTab(initialTab)},[initialTab]);
  const load=async()=>{setLoading(true);try{const [p,v,w,o,po]=await Promise.all([get<Product[]>("/api/products"),get<Vendor[]>("/api/vendors"),get<Warehouse[]>("/api/warehouses"),get<Order[]>("/api/orders"),get<Purchase[]>("/api/purchases")]);setProducts(p);setVendors(v);setWarehouses(w);setOrders(o);setPurchases(po)}finally{setLoading(false)}};
  useEffect(()=>{load()},[]);
  const filtered=products.filter(p=>(p.name+p.sku+(p.category||"")).toLowerCase().includes(search.toLowerCase()));
@@ -52,7 +52,7 @@ function EntryModal({kind,products,vendors,warehouses,onClose,onSaved}:{kind:str
    onSaved();
  }catch(e){setError(e instanceof Error?e.message:"Unable to save")}finally{setSaving(false)}};
  const Field=({label,k,placeholder,type="text",required=true}:{label:string;k:string;placeholder?:string;type?:string;required?:boolean})=><label className="field"><span>{label}{required&&" *"}</span><input type={type} value={f[k]??""} placeholder={placeholder} onChange={e=>set(k,e.target.value)}/></label>;
- const Select=({label,k,children}:{label:string;k:string;children:React.ReactNode})=><label className="field"><span>{label} *</span><select value={f[k]??""} onChange={e=>set(k,e.target.value)}><option value="">Select {label}</option>{children}</select></label>;
+ const Select=({label,k,children}:{label:string;k:string;children:ReactNode})=><label className="field"><span>{label} *</span><select value={f[k]??""} onChange={e=>set(k,e.target.value)}><option value="">Select {label}</option>{children}</select></label>;
  return <div className="modalback"><div className="modalbox">
   <div className="modalhead"><div><small>PERSONAL MUNIM JEE</small><h2>{title}</h2><p>Enter details carefully. Required fields are marked *</p></div><button className="close" onClick={onClose}><X size={20}/></button></div>
   <div className="steps"><div className={step>=1?"step on":"step"}><b>1</b><span>Basic Details</span></div>{kind==="purchase"&&<div className={step>=2?"step on":"step"}><b>2</b><span>Item Details</span></div>}<div className={step>=3?"step on":"step"}><b>{kind==="purchase"?3:2}</b><span>Review & Save</span></div></div>
