@@ -27,7 +27,8 @@ const money=(n:number)=>new Intl.NumberFormat("en-IN",{style:"currency",currency
 function managementTab(key:string){if(key==="products")return "products";if(key==="inventory")return "stock";if(key==="purchase")return "purchases";if(key==="sales")return "orders";if(key==="returns")return "returns";if(key==="vendors")return "vendors";return null;}
 
 export default function Home(){
- const [active,setActive]=useState("dashboard"),[query,setQuery]=useState(""),[dark,setDark]=useState(false),[dashboardData,setDashboardData]=useState<any>(null);\n useEffect(()=>{if(active==="dashboard"){fetch("/api/dashboard").then(r=>r.ok?r.json():null).then(setDashboardData).catch(()=>{})}},[active]);
+ const [active,setActive]=useState("dashboard"),[query,setQuery]=useState(""),[dark,setDark]=useState(false),[dashboardData,setDashboardData]=useState<any>(null);
+ useEffect(()=>{if(active==="dashboard"){fetch("/api/dashboard").then(r=>r.ok?r.json():null).then(setDashboardData).catch(()=>{})}},[active]);
  const products=initial;
  const filtered=useMemo(()=>products.filter(p=>(p.name+p.sku+p.category).toLowerCase().includes(query.toLowerCase())),[query]);
  const units=products.reduce((s,p)=>s+p.stock,0),value=products.reduce((s,p)=>s+p.stock*p.cost,0);
@@ -47,7 +48,8 @@ export default function Home(){
  </main>
 }
 
-function Dashboard({products,value,units,data,onGo}:{products:Product[];value:number;units:number;data:any;onGo:(x:string)=>void}){\n const live=data?.metrics; const stockStatus=data?.stockStatus; const recent=data?.recent||[]; const low=data?.lowStock||products;
+function Dashboard({products,value,units,data,onGo}:{products:Product[];value:number;units:number;data:any;onGo:(x:string)=>void}){
+ const live=data?.metrics; const stockStatus=data?.stockStatus; const recent=data?.recent||[]; const low=data?.lowStock||products;
  return <div className="dashboard">
   <div className="page-title"><div><h1>Dashboard</h1><p>Welcome back! Here's your business overview.</p></div><button className="datebox">◫ &nbsp;01 Sep 2026 - 30 Sep 2026⌄</button></div>
   <div className="metricgrid">
