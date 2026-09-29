@@ -14,10 +14,10 @@ async function get<T>(url:string):Promise<T>{const r=await fetch(url);if(!r.ok)t
 
 export default function Management({initialTab}:{initialTab?:"products"|"purchases"|"vendors"|"warehouses"|"orders"|"stock"|"returns"}={}){
  const [tab,setTab]=useState<"products"|"purchases"|"vendors"|"warehouses"|"orders"|"stock"|"returns">(initialTab||"products");
- const [products,setProducts]=useState<Product[]>([]),[vendors,setVendors]=useState<Vendor[]>([]),[warehouses,setWarehouses]=useState<Warehouse[]>([]),[orders,setOrders]=useState<Order[]>([]),[purchases,setPurchases]=useState<Purchase[]>([]);
+ const [products,setProducts]=useState<Product[]>([]),[vendors,setVendors]=useState<Vendor[]>([]),[warehouses,setWarehouses]=useState<Warehouse[]>([]),[orders,setOrders]=useState<Order[]>([]),[purchases,setPurchases]=useState<Purchase[]>([]),[movements,setMovements]=useState<any[]>([]);
  const [loading,setLoading]=useState(false),[search,setSearch]=useState(""),[modal,setModal]=useState<string|null>(null);
  useEffect(()=>{if(initialTab)setTab(initialTab)},[initialTab]);
- const load=async()=>{setLoading(true);try{const [p,v,w,o,po]=await Promise.all([get<Product[]>("/api/products"),get<Vendor[]>("/api/vendors"),get<Warehouse[]>("/api/warehouses"),get<Order[]>("/api/orders"),get<Purchase[]>("/api/purchases")]);setProducts(p);setVendors(v);setWarehouses(w);setOrders(o);setPurchases(po)}finally{setLoading(false)}};
+ const load=async()=>{setLoading(true);try{const [p,v,w,o,po,m]=await Promise.all([get<Product[]>("/api/products"),get<Vendor[]>("/api/vendors"),get<Warehouse[]>("/api/warehouses"),get<Order[]>("/api/orders"),get<Purchase[]>("/api/purchases"),get<any[]>("/api/stock/move")]);setProducts(p);setVendors(v);setWarehouses(w);setOrders(o);setPurchases(po);setMovements(m)}finally{setLoading(false)}};
  useEffect(()=>{load()},[]);
  const filtered=products.filter(p=>(p.name+p.sku+(p.category||"")).toLowerCase().includes(search.toLowerCase()));
  const tabs:any[]=[["products","Products",PackagePlus],["purchases","Purchases",ShoppingBag],["vendors","Vendors",Truck],["warehouses","Warehouses",WarehouseIcon],["orders","Orders",ArrowUpFromLine],["stock","Stock IN/OUT",ReceiptText],["returns","Returns/RTO",Undo2]];
@@ -32,8 +32,8 @@ export default function Management({initialTab}:{initialTab?:"products"|"purchas
   {tab==="vendors"&&<Table title="Vendor Master" headers={["Vendor","GSTIN","Phone"]}>{vendors.map(v=><tr key={v.id}><td><b>{v.name}</b></td><td>{v.gstin||"-"}</td><td>{v.phone||"-"}</td></tr>)}</Table>}
   {tab==="warehouses"&&<Table title="Warehouse Master" headers={["Code","Warehouse","City","Status"]}>{warehouses.map(w=><tr key={w.id}><td>{w.code}</td><td><b>{w.name}</b></td><td>{w.city||"-"}</td><td><Badge text="Active"/></td></tr>)}</Table>}
   {tab==="orders"&&<Table title="Sales & Orders" headers={["Order","Channel","Customer","Items","Total","Status","Action"]}>{orders.map(o=><tr key={o.id}><td><b>{o.orderNumber}</b></td><td>{o.channel}</td><td>{o.customerName||"-"}</td><td>{o.items.reduce((s,i)=>s+i.quantity,0)}</td><td>{money(Number(o.total))}</td><td><Badge text={o.status}/></td><td><button className="ship" onClick={()=>ship(o.id)}>Ship</button></td></tr>)}</Table>}
-  {tab==="stock"&&<Empty icon={ReceiptText} title="Stock IN / OUT" text="Every movement is posted against a product and warehouse with reference and notes."/>}
-  {tab==="returns"&&<Empty icon={Undo2} title="Returns / RTO" text="Record customer returns, choose restocking, and keep the movement auditable."/>}
+  {tab==="stock"&&<Table title="Stock IN / OUT" headers={["Date","Product","Warehouse","Type","Qty","Reference","Notes"]}>{movements.map(m=><tr key={m.id}><td>{new Date(m.createdAt).toLocaleString("en-IN")}</td><td><b>{m.product?.name||"-"}</b><br/><small>{m.product?.sku||""}</small></td><td>{m.warehouse?.name||"-"}</td><td><Badge text={m.type}/></td><td>{m.quantity}</td><td>{m.reference||"-"}</td><td>{m.notes||"-"}</td></tr>)}</Table>}
+  {tab==="returns"&&<Table title="Returns / RTO" headers={["Date","Product","Warehouse","Type","Qty","Reference","Notes"]}>{movements.filter(m=>m.type==="CUSTOMER_RETURN"||m.type==="PURCHASE_RETURN").map(m=><tr key={m.id}><td>{new Date(m.createdAt).toLocaleString("en-IN")}</td><td><b>{m.product?.name||"-"}</b><br/><small>{m.product?.sku||""}</small></td><td>{m.warehouse?.name||"-"}</td><td><Badge text={m.type}/></td><td>{m.quantity}</td><td>{m.reference||"-"}</td><td>{m.notes||"-"}</td></tr>)}</Table>}
   {modal&&<EntryModal kind={modal} products={products} vendors={vendors} warehouses={warehouses} onClose={()=>setModal(null)} onSaved={()=>{setModal(null);load()}}/>}
  </div>
 }
