@@ -33,7 +33,17 @@ export default function Home(){
  const filtered=useMemo(()=>products.filter(p=>(p.name+p.sku+p.category).toLowerCase().includes(query.toLowerCase())),[query]);
  const units=products.reduce((s,p)=>s+p.stock,0),value=products.reduce((s,p)=>s+p.stock*p.cost,0);
  const target=managementTab(active);
- return <main className={dark?"app dark":"app"}>
+ return <div className={dark?"site-shell dark":"site-shell"}>
+  <div className="hero-brand">
+   <div className="hero-inner">
+    <div className="hero-munim"><img src="/munim-jee-logo.svg" alt="Personal Munim Jee"/></div>
+    <div className="hero-title"><h1>Personal</h1><h2>Munim Jee</h2><div className="hero-leaf">◒</div><p>STOCK&nbsp;&nbsp; | &nbsp;&nbsp;PURCHASE&nbsp;&nbsp; | &nbsp;&nbsp;SALES&nbsp;&nbsp; | &nbsp;&nbsp;ACCOUNTS&nbsp;&nbsp; | &nbsp;&nbsp;GST</p><small>व्यवसाय का भरोसेमंद साथी</small></div>
+    <div className="hero-cards">
+     {[0,1,2].map((x)=><div className={"hero-card hc"+x} key={x}><img src="/munim-jee-logo.svg" alt="Munim Jee"/><b>Personal<br/>Munim Jee</b></div>)}
+    </div>
+   </div>
+  </div>
+  <main className="app">
   <aside className="sidebar">
    <div className="brand"><div className="logoimg"><img src="/munim-jee-logo.svg" alt="Personal Munim Jee"/></div><div><b>Personal <span>Munim Jee</span></b><small>Business Management</small></div></div>
    <div className="workspace">MAIN MENU</div>
@@ -46,6 +56,7 @@ export default function Home(){
    <footer>Personal Munim Jee v1.0 · Stock · Purchase · Sales · Accounts · GST</footer>
   </section>
  </main>
+ </div>
 }
 
 function Dashboard({products,value,units,data,onGo}:{products:Product[];value:number;units:number;data:any;onGo:(x:string)=>void}){
