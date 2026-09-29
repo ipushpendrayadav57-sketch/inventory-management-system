@@ -28,3 +28,30 @@ body{background:#050403}
 @media(max-width:1250px){.hero-inner{padding:0 25px}.hero-munim{width:200px}.hero-munim img{width:200px}.hero-title{min-width:430px}.hero-title h1{font-size:52px}.hero-title h2{font-size:58px}.hero-cards{gap:10px}.hero-card{width:125px;height:160px}.hero-card img{width:88px;height:88px}.hero-card b{font-size:17px}}
 @media(max-width:900px){.hero-brand{height:190px}.hero-inner{padding:0 15px}.hero-munim{width:145px;height:175px}.hero-munim img{width:145px}.hero-title{min-width:0;margin-left:5px}.hero-title h1{font-size:38px}.hero-title h2{font-size:43px}.hero-title p{font-size:7px;letter-spacing:2px;margin-top:14px}.hero-title small{font-size:11px}.hero-cards{display:none}.hero-leaf{right:10px;font-size:35px}.site-shell>.app{min-height:calc(100vh - 190px)}.site-shell>.app .sidebar{min-height:calc(100vh - 190px)}}
 @media(max-width:700px){.hero-brand{height:145px}.hero-munim{width:105px;height:135px}.hero-munim img{width:105px}.hero-title h1{font-size:27px}.hero-title h2{font-size:31px}.hero-title p{font-size:5px;letter-spacing:1px}.hero-title small{font-size:8px}.site-shell>.app{min-height:calc(100vh - 145px);margin:0}.site-shell>.app .sidebar{min-height:calc(100vh - 145px)}}
+
+/* Reference purchase drawer */
+.modalback:has(.purchasemodal){align-items:flex-start;justify-content:flex-end;padding:290px 16px 16px}
+.modalback:has(.purchasemodal) .purchasemodal{width:490px;max-height:calc(100vh - 306px);border-radius:14px;display:grid;grid-template-columns:150px 1fr;grid-template-rows:auto 1fr auto}
+.modalback:has(.purchasemodal) .purchasemodal .modalhead{grid-column:1/-1;grid-row:1;padding:14px 18px 11px}
+.modalback:has(.purchasemodal) .purchasemodal .modalhead h2{font-size:17px;margin:2px 0}
+.modalback:has(.purchasemodal) .purchasemodal .modalhead p{font-size:9px}
+.modalback:has(.purchasemodal) .purchasemodal .steps{grid-column:1;grid-row:2/4;display:flex;flex-direction:column;gap:0;padding:14px 12px 14px 18px;border-right:1px solid #edf0f4;border-bottom:0}
+.modalback:has(.purchasemodal) .purchasemodal .step{position:relative;min-height:62px;align-items:flex-start;gap:8px;font-size:9px}
+.modalback:has(.purchasemodal) .purchasemodal .step:not(:last-child):after{content:"";position:absolute;left:12px;top:27px;width:1px;height:38px;background:#dfe4eb}
+.modalback:has(.purchasemodal) .purchasemodal .step.on:not(:last-child):after{background:#d8a94c}
+.modalback:has(.purchasemodal) .purchasemodal .step b{width:25px;height:25px;flex:0 0 25px;z-index:1}
+.modalback:has(.purchasemodal) .purchasemodal .step>div{padding-top:3px}
+.modalback:has(.purchasemodal) .purchasemodal .step span{display:block}
+.modalback:has(.purchasemodal) .purchasemodal .step small{display:block;margin-top:3px}
+.modalback:has(.purchasemodal) .purchasemodal .modalbody{grid-column:2;grid-row:2;padding:16px 16px 8px;min-height:0;overflow:auto}
+.modalback:has(.purchasemodal) .purchasemodal .modalfoot{grid-column:2;grid-row:3;padding:10px 16px 14px}
+.modalback:has(.purchasemodal) .purchasemodal .formgrid{gap:11px}
+.modalback:has(.purchasemodal) .purchasemodal .field{gap:4px}
+.modalback:has(.purchasemodal) .purchasemodal .field span{font-size:8px}
+.modalback:has(.purchasemodal) .purchasemodal .field input,.modalback:has(.purchasemodal) .purchasemodal .field select{height:34px;font-size:10px}
+@media(max-width:700px){
+ .modalback:has(.purchasemodal){align-items:center;justify-content:center;padding:10px}
+ .modalback:has(.purchasemodal) .purchasemodal{width:96vw;max-height:95vh;display:flex;flex-direction:column}
+ .modalback:has(.purchasemodal) .purchasemodal .steps{display:grid;grid-template-columns:repeat(4,120px);flex-direction:row;border-right:0;border-bottom:1px solid #edf0f4;overflow:auto;padding:10px}
+ .modalback:has(.purchasemodal) .purchasemodal .modalbody,.modalback:has(.purchasemodal) .purchasemodal .modalfoot{width:100%}
+}
