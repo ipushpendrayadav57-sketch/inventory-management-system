@@ -36,16 +36,16 @@ export default function Home(){
  return <div className={dark?"site-shell dark":"site-shell"}>
   <div className="hero-brand">
    <div className="hero-inner">
-    <div className="hero-munim"><img src="/munim-jee-logo-fixed.svg" alt="Personal Munim Jee"/></div>
+    <div className="hero-munim"><img src="/munim-logo.jpg" alt="Personal Munim Jee"/></div>
     <div className="hero-title"><h1>Personal</h1><h2>Munim Jee</h2><div className="hero-leaf">◒</div><p>STOCK&nbsp;&nbsp; | &nbsp;&nbsp;PURCHASE&nbsp;&nbsp; | &nbsp;&nbsp;SALES&nbsp;&nbsp; | &nbsp;&nbsp;ACCOUNTS&nbsp;&nbsp; | &nbsp;&nbsp;GST</p><small>व्यवसाय का भरोसेमंद साथी</small></div>
     <div className="hero-cards">
-     {[0,1,2].map((x)=><div className={"hero-card hc"+x} key={x}><img src="/munim-jee-logo-fixed.svg" alt="Munim Jee"/><b>Personal<br/>Munim Jee</b></div>)}
+     {[0,1,2].map((x)=><div className={"hero-card hc"+x} key={x}><img src="/munim-logo.jpg" alt="Munim Jee"/><b>Personal<br/>Munim Jee</b></div>)}
     </div>
    </div>
   </div>
   <main className="app">
   <aside className="sidebar">
-   <div className="brand"><div className="logoimg"><img src="/munim-jee-logo-fixed.svg" alt="Personal Munim Jee"/></div><div><b>Personal <span>Munim Jee</span></b><small>Business Management</small></div></div>
+   <div className="brand"><div className="logoimg"><img src="/munim-logo.jpg" alt="Personal Munim Jee"/></div><div><b>Personal <span>Munim Jee</span></b><small>Business Management</small></div></div>
    <div className="workspace">MAIN MENU</div>
    <nav>{nav.map(([label,key,Icon])=><button className={active===key?"nav active":"nav"} key={key} onClick={()=>setActive(key)}><Icon size={17}/><span>{label}</span>{key==="sales"&&<em>12</em>}</button>)}</nav>
    <div className="sidebar-health"><div><i/> All systems working</div><small>Business Health</small></div><div className="version">v1.0.0</div>
