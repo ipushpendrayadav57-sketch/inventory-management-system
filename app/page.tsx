@@ -1,6 +1,6 @@
 "use client";
 
-import {useMemo,useState} from "react";
+import {useEffect,useMemo,useState} from "react";
 import type {ReactNode} from "react";
 import Management from "./management";
 import {LayoutDashboard,Package,Boxes,ShoppingCart,TrendingUp,RotateCcw,Receipt,WalletCards,BarChart3,FileText,Users,UserRound,BriefcaseBusiness,Settings,Search,Bell,ChevronDown,Moon,Sun,ShoppingCart as CartIcon,AlertTriangle} from "lucide-react";
@@ -27,7 +27,7 @@ const money=(n:number)=>new Intl.NumberFormat("en-IN",{style:"currency",currency
 function managementTab(key:string){if(key==="products")return "products";if(key==="inventory")return "stock";if(key==="purchase")return "purchases";if(key==="sales")return "orders";if(key==="returns")return "returns";if(key==="vendors")return "vendors";return null;}
 
 export default function Home(){
- const [active,setActive]=useState("dashboard"),[query,setQuery]=useState(""),[dark,setDark]=useState(false);
+ const [active,setActive]=useState("dashboard"),[query,setQuery]=useState(""),[dark,setDark]=useState(false),[dashboardData,setDashboardData]=useState<any>(null);\n useEffect(()=>{if(active==="dashboard"){fetch("/api/dashboard").then(r=>r.ok?r.json():null).then(setDashboardData).catch(()=>{})}},[active]);
  const products=initial;
  const filtered=useMemo(()=>products.filter(p=>(p.name+p.sku+p.category).toLowerCase().includes(query.toLowerCase())),[query]);
  const units=products.reduce((s,p)=>s+p.stock,0),value=products.reduce((s,p)=>s+p.stock*p.cost,0);
@@ -41,37 +41,30 @@ export default function Home(){
   </aside>
   <section className="content">
    <header className="topbar"><div className="global-search"><Search size={16}/><input placeholder="Search products, orders, vendors..." value={query} onChange={e=>setQuery(e.target.value)}/><kbd>Ctrl K</kbd></div><div className="head-actions"><button className="circlebtn" onClick={()=>setDark(!dark)}>{dark?<Sun size={17}/>:<Moon size={17}/>}</button><button className="circlebtn notification"><Bell size={17}/><i/></button><div className="profile"><div className="avatar">PY</div><div><b>Pushpendra Yadav</b><small>Admin</small></div><ChevronDown size={15}/></div></div></header>
-   {active==="dashboard"?<Dashboard products={filtered} value={value} units={units} onGo={setActive}/>:target?<Management initialTab={target as any}/>:<ComingSoon title={nav.find(x=>x[1]===active)?.[0]||"Module"}/>}
+   {active==="dashboard"?<Dashboard products={filtered} value={value} units={units} data={dashboardData} onGo={setActive}/>:target?<Management initialTab={target as any}/>:<ComingSoon title={nav.find(x=>x[1]===active)?.[0]||"Module"}/>}
    <footer>Personal Munim Jee v1.0 · Stock · Purchase · Sales · Accounts · GST</footer>
   </section>
  </main>
 }
 
-function Dashboard({products,value,units,onGo}:{products:Product[];value:number;units:number;onGo:(x:string)=>void}){
+function Dashboard({products,value,units,data,onGo}:{products:Product[];value:number;units:number;data:any;onGo:(x:string)=>void}){\n const live=data?.metrics; const stockStatus=data?.stockStatus; const recent=data?.recent||[]; const low=data?.lowStock||products;
  return <div className="dashboard">
   <div className="page-title"><div><h1>Dashboard</h1><p>Welcome back! Here's your business overview.</p></div><button className="datebox">◫ &nbsp;01 Sep 2026 - 30 Sep 2026⌄</button></div>
   <div className="metricgrid">
-   <Metric icon={<CartIcon/>} label="Total Purchase" value="₹ 2,48,320" trend="↗ 12% vs last month"/>
-   <Metric icon={<BarChart3/>} label="Total Sales" value="₹ 3,25,600" trend="↗ 18% vs last month"/>
-   <Metric icon={<Package/>} label="Current Stock Value" value={money(value+490000)} trend={"● "+units.toLocaleString("en-IN")+" units"}/>
-   <Metric icon={<WalletCards/>} label="Pending Payments" value="₹ 1,12,450" trend="5 vendors due" danger/>
+   <Metric icon={<CartIcon/>} label="Total Purchase" value={money(live?.totalPurchase??0)} trend="Live database"/>
+   <Metric icon={<BarChart3/>} label="Total Sales" value={money(live?.totalSales??0)} trend="Live database"/>
+   <Metric icon={<Package/>} label="Current Stock Value" value={money(live?.stockValue??0)} trend={"● "+(live?.units??0).toLocaleString("en-IN")+" units"}/>
+   <Metric icon={<WalletCards/>} label="Pending Payments" value={money(live?.pendingPayments??0)} trend="Live vendor dues" danger/>
   </div>
   <div className="dashboard-grid">
    <div className="panel chartpanel"><div className="panelhead"><div><h3>Sales vs Purchase</h3><small>Monthly comparison</small></div><select><option>Last 12 Months</option></select></div><div className="legend"><span><i className="blue"/>Sales</span><span><i className="green"/>Purchase</span></div><div className="chart">
     {[["Jan",2.7,1.6],["Feb",2.1,2.8],["Mar",2.3,1.4],["Apr",2.5,1.5],["May",3.6,2.1],["Jun",1.4,2.3],["Jul",3.1,2.1],["Aug",4.6,1.7],["Sep",2.8,3.2]].map(([m,s,p])=><div className="chartcol" key={m as string}><div className="bars2"><i style={{height:(Number(s)*16)+"%"}}/><b style={{height:(Number(p)*16)+"%"}}/></div><small>{m}</small></div>)}
    </div></div>
-   <div className="panel stockpanel"><div className="panelhead"><div><h3>Stock Status</h3><small>Current inventory health</small></div></div><div className="stockvisual"><div className="donut"><strong>1,280</strong><small>Units</small></div><div className="stocklegend"><span><i className="green-dot"/>In Stock <b>72%</b></span><span><i className="yellow-dot"/>Low Stock <b>18%</b></span><span><i className="red-dot"/>Out of Stock <b>10%</b></span></div></div></div>
+   <div className="panel stockpanel"><div className="panelhead"><div><h3>Stock Status</h3><small>Current inventory health</small></div></div><div className="stockvisual"><div className="donut"><strong>{(live?.units??0).toLocaleString("en-IN")}</strong><small>Units</small></div><div className="stocklegend"><span><i className="green-dot"/>In Stock <b>{stockStatus?Math.round((stockStatus.inStock/Math.max(1,live.units))*100):0}%</b></span><span><i className="yellow-dot"/>Low Stock <b>{stockStatus?Math.round((stockStatus.lowStock/Math.max(1,live.units))*100):0}%</b></span><span><i className="red-dot"/>Out of Stock <b>{stockStatus?stockStatus.outOfStock:0}</b></span></div></div></div>
   </div>
   <div className="dashboard-grid lower">
-   <div className="panel"><div className="panelhead"><h3>Recent Transactions</h3><button className="linkbtn">View All</button></div><div className="mini-table">
-    <div className="tr headrow"><span>Date</span><span>Type</span><span>Ref. No.</span><span>Party</span><span>Amount</span></div>
-    <div className="tr"><span>26 Sep 2026</span><span><b className="pill sale">Sale</b></span><span>SAL-0001</span><span>Retail Customer</span><strong>₹ 2,840</strong></div>
-    <div className="tr"><span>26 Sep 2026</span><span><b className="pill purchase">Purchase</b></span><span>PUR-0021</span><span>CasaDitta</span><strong>₹ 23,080</strong></div>
-    <div className="tr"><span>25 Sep 2026</span><span><b className="pill sale">Sale</b></span><span>SAL-0000</span><span>Online (Flipkart)</span><strong>₹ 4,120</strong></div>
-    <div className="tr"><span>25 Sep 2026</span><span><b className="pill expense">Expense</b></span><span>EXP-0012</span><span>Warehouse Rent</span><strong>₹ 12,500</strong></div>
-    <div className="tr"><span>24 Sep 2026</span><span><b className="pill purchase">Purchase</b></span><span>PUR-0020</span><span>Local Vendor</span><strong>₹ 18,650</strong></div>
-   </div></div>
-   <div className="panel"><div className="panelhead"><h3>Low Stock Products</h3><button className="linkbtn">View All</button></div><div className="mini-table lowtable"><div className="tr headrow"><span>Product</span><span>SKU</span><span>Current</span><span>Reorder</span></div>{products.slice(0,5).map(p=><div className="tr" key={p.sku}><span><b>{p.name}</b></span><span>{p.sku}</span><span><strong className="stocknum">{p.stock}</strong></span><span>10</span></div>)}</div></div>
+   <div className="panel"><div className="panelhead"><h3>Recent Transactions</h3><button className="linkbtn">View All</button></div><div className="mini-table"><div className="tr headrow"><span>Date</span><span>Type</span><span>Ref. No.</span><span>Party</span><span>Amount</span></div>{recent.map((x:any,i:number)=><div className="tr" key={x.ref+i}><span>{new Date(x.date).toLocaleDateString("en-IN")}</span><span><b className={"pill "+(x.type==="Sale"?"sale":"purchase")}>{x.type}</b></span><span>{x.ref}</span><span>{x.party}</span><strong>{money(x.amount)}</strong></div>)}</div></div>
+   <div className="panel"><div className="panelhead"><h3>Low Stock Products</h3><button className="linkbtn">View All</button></div><div className="mini-table lowtable"><div className="tr headrow"><span>Product</span><span>SKU</span><span>Current</span><span>Reorder</span></div>{low.slice(0,5).map((p:any)=><div className="tr" key={p.sku}><span><b>{p.name}</b></span><span>{p.sku}</span><span><strong className="stocknum">{p.stock}</strong></span><span>{p.reorder??10}</span></div>)}</div></div>
   </div>
   <div className="quick-actions"><h3>Quick Actions</h3><div><button onClick={()=>onGo("purchase")}><CartIcon/><span>Add Purchase</span></button><button onClick={()=>onGo("sales")}><TrendingUp/><span>Add Sale</span></button><button onClick={()=>onGo("products")}><Package/><span>Add Product</span></button><button onClick={()=>onGo("expenses")}><Receipt/><span>Add Expense</span></button></div></div>
  </div>
